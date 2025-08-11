@@ -1,0 +1,15 @@
+package com.negadras.modumart.notifications;
+
+public enum NotificationType {
+    WELCOME,
+    ORDER_CONFIRMATION,
+    ORDER_SHIPPED,
+    ORDER_DELIVERED,
+    PAYMENT_RECEIVED,
+    PAYMENT_FAILED,
+    PRODUCT_OUT_OF_STOCK,
+    SHIPMENT_UPDATE,
+    ORDER_CANCELLED,
+    DELIVERY_ATTEMPT_FAILED,
+    ACCOUNT_UPDATE
+}
