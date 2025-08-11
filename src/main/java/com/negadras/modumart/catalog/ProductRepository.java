@@ -9,12 +9,12 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends CrudRepository<Product, Long> {
-    
+
     List<Product> findByCategory(String category);
-    
+
     @Query("SELECT * FROM products WHERE stock > :minStock")
     List<Product> findProductsInStock(@Param("minStock") Integer minStock);
-    
+
     @Query("SELECT * FROM products WHERE name ILIKE %:name%")
     List<Product> findByNameContaining(@Param("name") String name);
 }
