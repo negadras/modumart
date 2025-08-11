@@ -1,1 +1,21 @@
-spring.application.name=modumart
+spring:
+  application:
+    name: modumart
+  datasource:
+    url: jdbc:postgresql://localhost:5432/modumart
+    username: ${DB_USERNAME:modumart}
+    password: ${DB_PASSWORD:modumart}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
