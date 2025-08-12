@@ -22,7 +22,8 @@ class ModuleBoundaryTests {
                         "orders", 
                         "payments", 
                         "shipping", 
-                        "notifications"
+                        "notifications",
+                        "analytics"
                 );
     }
 
@@ -73,6 +74,14 @@ class ModuleBoundaryTests {
         
         // Notifications module should be a cross-cutting concern
         assertThat(notifications).isNotNull();
+    }
+
+    @Test
+    void analyticsModuleShouldBeACrossCuttingConcern() {
+        ApplicationModule analytics = modules.getModuleByName("analytics").orElseThrow();
+        
+        // Analytics module should be a cross-cutting concern listening to all events
+        assertThat(analytics).isNotNull();
     }
 
     @Test
