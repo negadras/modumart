@@ -1,13 +1,13 @@
 spring:
   application:
     name: modumart
-  
+
   datasource:
     url: jdbc:postgresql://localhost:5432/modumart
     username: ${DB_USERNAME:modumart}
-    password: ${DB_PASSWORD:modumart}
+    password: ${DB_PASSWORD:modumart123}
     driver-class-name: org.postgresql.Driver
-  
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -16,12 +16,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-  
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
     drop-first: false
-  
+
   modulith:
     events:
       jdbc:
@@ -30,7 +30,7 @@ spring:
       completion-update-interval: PT1M
       incomplete-events-cleanup-interval: PT1H
       retention-duration: P7D
-      
+
   task:
     execution:
       pool:
