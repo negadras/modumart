@@ -10,14 +10,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderEventHandler {
+public class CatalogOrderEventHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderEventHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CatalogOrderEventHandler.class);
 
     private final ProductRepository productRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public OrderEventHandler(ProductRepository productRepository, ApplicationEventPublisher eventPublisher) {
+    public CatalogOrderEventHandler(ProductRepository productRepository, ApplicationEventPublisher eventPublisher) {
         this.productRepository = productRepository;
         this.eventPublisher = eventPublisher;
     }

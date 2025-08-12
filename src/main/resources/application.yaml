@@ -17,10 +17,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
   
-  flyway:
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    drop-first: false
   
   modulith:
     events:

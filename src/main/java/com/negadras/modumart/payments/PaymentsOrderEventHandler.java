@@ -7,13 +7,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderEventHandler {
+public class PaymentsOrderEventHandler {
     
-    private static final Logger logger = LoggerFactory.getLogger(OrderEventHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentsOrderEventHandler.class);
     
     private final PaymentService paymentService;
     
-    public OrderEventHandler(PaymentService paymentService) {
+    public PaymentsOrderEventHandler(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
     

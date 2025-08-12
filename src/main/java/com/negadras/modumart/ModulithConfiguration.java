@@ -3,14 +3,12 @@ package com.negadras.modumart;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.modulith.events.config.EnablePersistentDomainEvents;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.Duration;
 
 @Configuration
-@EnablePersistentDomainEvents
 @EnableAsync
 @EnableScheduling
 public class ModulithConfiguration {

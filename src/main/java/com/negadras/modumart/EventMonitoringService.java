@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -16,12 +18,11 @@ public class EventMonitoringService {
     
     private static final Logger logger = LoggerFactory.getLogger(EventMonitoringService.class);
     
-    private final EventStoreService eventStoreService;
     private final AtomicLong totalEventsProcessed = new AtomicLong(0);
     private final AtomicLong eventsInLastHour = new AtomicLong(0);
+    private final Map<String, AtomicLong> eventCounters = new ConcurrentHashMap<>();
     
-    public EventMonitoringService(EventStoreService eventStoreService) {
-        this.eventStoreService = eventStoreService;
+    public EventMonitoringService() {
     }
     
     /**
@@ -33,7 +34,7 @@ public class EventMonitoringService {
         String eventType = event.getClass().getSimpleName();
         
         // Record metrics
-        eventStoreService.recordEventMetrics(eventType);
+        recordEventMetrics(eventType);
         totalEventsProcessed.incrementAndGet();
         eventsInLastHour.incrementAndGet();
         
@@ -44,63 +45,30 @@ public class EventMonitoringService {
     }
     
     /**
-     * Scheduled task to clean up old completed events
+     * Record event metrics for monitoring
      */
-    @Scheduled(fixedRateString = "#{@modulithEventProperties.incompleteEventsCleanupInterval.toMillis()}")
-    public void cleanupOldEvents() {
-        logger.info("Starting scheduled cleanup of old events");
-        
-        try {
-            var properties = eventStoreService.getEventStoreStats();
-            logger.info("Event store statistics: {}", properties);
-            
-            eventStoreService.cleanupCompletedEvents(java.time.Duration.ofDays(7));
-            
-        } catch (Exception e) {
-            logger.error("Error during scheduled event cleanup", e);
-        }
+    public void recordEventMetrics(String eventType) {
+        eventCounters.computeIfAbsent(eventType, ignored -> new AtomicLong(0)).incrementAndGet();
     }
     
     /**
-     * Scheduled task to retry failed events
+     * Scheduled task to log event statistics (Spring Modulith handles cleanup automatically)
      */
-    @Scheduled(fixedRateString = "#{@modulithEventProperties.completionUpdateInterval.toMillis()}")
-    public void retryFailedEvents() {
-        logger.debug("Checking for failed events to retry");
-        
-        try {
-            int retriedCount = eventStoreService.retryFailedEvents();
-            
-            if (retriedCount > 0) {
-                logger.info("Retried {} failed events", retriedCount);
-            }
-            
-        } catch (Exception e) {
-            logger.error("Error during failed event retry", e);
-        }
-    }
-    
-    /**
-     * Scheduled task to log event statistics
-     */
-    @Scheduled(fixedRate = 300000) // Every 5 minutes
+    @Scheduled(fixedRate = 3600000) // Every hour
     public void logEventStatistics() {
-        var stats = eventStoreService.getEventStoreStats();
-        var metrics = eventStoreService.getEventMetrics();
-        
-        logger.info("=== Event Store Statistics ===");
+        logger.info("=== Event Monitoring Statistics ===");
         logger.info("Total events processed: {}", totalEventsProcessed.get());
         logger.info("Events in last hour: {}", eventsInLastHour.get());
-        logger.info("Incomplete events: {}", stats.incompleteEvents());
-        logger.info("Event types tracked: {}", stats.eventTypes());
-        logger.info("Oldest incomplete event age: {}", stats.oldestIncompleteEventAge());
+        logger.info("Event types tracked: {}", eventCounters.size());
         
-        if (!metrics.isEmpty()) {
+        if (!eventCounters.isEmpty()) {
             logger.info("Event metrics by type:");
-            metrics.forEach((type, count) -> 
-                logger.info("  {}: {} events", type, count)
+            eventCounters.forEach((type, count) -> 
+                logger.info("  {}: {} events", type, count.get())
             );
         }
+        
+        logger.info("Note: Spring Modulith handles event persistence and retry automatically");
     }
     
     /**
@@ -116,22 +84,27 @@ public class EventMonitoringService {
      * Get current monitoring statistics
      */
     public EventMonitoringStats getMonitoringStats() {
-        var eventStoreStats = eventStoreService.getEventStoreStats();
-        
         return new EventMonitoringStats(
                 totalEventsProcessed.get(),
                 eventsInLastHour.get(),
-                eventStoreStats.incompleteEvents(),
-                eventStoreStats.eventTypes(),
-                eventStoreStats.oldestIncompleteEventAge().toMinutes()
+                eventCounters.size()
         );
+    }
+    
+    /**
+     * Get event metrics by type
+     */
+    public Map<String, Long> getEventMetrics() {
+        return eventCounters.entrySet().stream()
+                .collect(java.util.stream.Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue().get()
+                ));
     }
     
     public record EventMonitoringStats(
             long totalEventsProcessed,
             long eventsInLastHour,
-            int incompleteEvents,
-            int eventTypes,
-            long oldestIncompleteEventAgeMinutes
+            int eventTypes
     ) {}
 }
