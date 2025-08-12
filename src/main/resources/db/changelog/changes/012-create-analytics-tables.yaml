@@ -1,0 +1,149 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-analytics-metrics-table
+      author: claude-code
+      changes:
+        - createTable:
+            tableName: analytics_metrics
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: metric_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metric_name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: DECIMAL(15,4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dimension
+                  type: VARCHAR(100)
+              - column:
+                  name: report_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metadata
+                  type: TEXT
+        - createIndex:
+            indexName: idx_analytics_metrics_type_date
+            tableName: analytics_metrics
+            columns:
+              - column:
+                  name: metric_type
+              - column:
+                  name: report_date
+        - createIndex:
+            indexName: idx_analytics_metrics_name_date
+            tableName: analytics_metrics
+            columns:
+              - column:
+                  name: metric_name
+              - column:
+                  name: report_date
+        - createIndex:
+            indexName: idx_analytics_metrics_report_date
+            tableName: analytics_metrics
+            columns:
+              - column:
+                  name: report_date
+
+  - changeSet:
+      id: create-analytics-reports-table
+      author: claude-code
+      changes:
+        - createTable:
+            tableName: analytics_reports
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: report_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: report_name
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: generated_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: report_data
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_revenue
+                  type: DECIMAL(15,4)
+                  defaultValue: 0
+              - column:
+                  name: total_orders
+                  type: BIGINT
+                  defaultValue: 0
+              - column:
+                  name: total_customers
+                  type: BIGINT
+                  defaultValue: 0
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: 'COMPLETED'
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_analytics_reports_type
+            tableName: analytics_reports
+            columns:
+              - column:
+                  name: report_type
+        - createIndex:
+            indexName: idx_analytics_reports_generated_at
+            tableName: analytics_reports
+            columns:
+              - column:
+                  name: generated_at
+        - createIndex:
+            indexName: idx_analytics_reports_date_range
+            tableName: analytics_reports
+            columns:
+              - column:
+                  name: start_date
+              - column:
+                  name: end_date
